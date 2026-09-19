@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="id" class="light scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Berita & CMS TAMVESTA - Tamansiswa</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        tamvesta: {
+                            50: '#f0f6ff',
+                            100: '#e0edff',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#1e3a8a',
+                            800: '#1e1b4b',
+                            dark: '#0f172a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js for Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .marquee-content { display: inline-block; whitespace: nowrap; animation: marquee 25s linear infinite; }
+        .marquee-container:hover .marquee-content { animation-play-state: paused; }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Top Announcement & Weather Info Bar -->
+    <div class="bg-tamvesta-700 text-white text-xs py-1.5 px-4 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+            <div class="flex items-center space-x-4">
+                <span><i class="fa-solid fa-location-dot mr-1 text-amber-300"></i> Batam, Riau Islands</span>
+                <span><i class="fa-regular fa-calendar-days mr-1 text-sky-200"></i> <span id="currentDateStr">Sabtu, 19 Sep 2026</span></span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="bg-amber-400 text-slate-900 px-2 py-0.5 rounded text-[10px] font-bold uppercase">Portal Resmi Tamansiswa</span>
+                <button onclick="toggleDarkMode()" class="hover:text-amber-300 transition" title="Ganti Mode Gelap/Terang"><i id="themeIcon" class="fa-solid fa-moon"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="sticky top-0 z-40 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('foryou')">
+                    <div class="bg-gradient-to-tr from-tamvesta-700 to-sky-500 text-white p-3 rounded-2xl shadow-md flex items-center justify-center">
+                        <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                    </div>
+                    <div>
+                        <span class="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-tamvesta-700 via-sky-600 to-blue-600 bg-clip-text text-transparent">BERITA TAMVESTA</span>
+                        <span class="text-[11px] block font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase">Portal Informasi & Edukasi</span>
+                    </div>
+                </div>
+
+                <!-- Desktop Menu Links -->
+                <div class="hidden lg:flex items-center space-x-1">
+                    <button onclick="navigateTo('foryou')" id="nav-foryou" class="nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-tamvesta-600 bg-tamvesta-50 dark:bg-slate-700">For You</button>
+                    <button onclick="navigateTo('pengumuman')" id="nav-pengumuman" class="nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:text-tamvesta-600">Pengumuman</button>
+                    <button onclick="navigateTo('blog')" id="nav-blog" class="nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:text-tamvesta-600">Blog</button>
+                    <button onclick="navigateTo('memory')" id="nav-memory" class="nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:text-tamvesta-600">Memory</button>
+                    <button onclick="navigateTo('prestasi')" id="nav-prestasi" class="nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:text-tamvesta-600">Prestasi</button>
+                    <button onclick="navigateTo('kegiatan')" id="nav-kegiatan" class="nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:text-tamvesta-600">Kegiatan</button>
+                    <button onclick="navigateTo('download')" id="nav-download" class="nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:text-tamvesta-600">Download</button>
+                    <button id="nav-custom-page" onclick="navigateTo('custom-page')" class="nav-link hidden px-3.5 py-2 rounded-xl text-xs font-bold transition text-purple-600 bg-purple-50 dark:bg-purple-900/30">Halaman Custom</button>
+                </div>
+
+                <!-- Auth Buttons & User Profile Controls -->
+                <div class="flex items-center space-x-3">
+                    <div id="authContainer" class="flex items-center space-x-2">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <button onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer Menu -->
+        <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 space-y-2">
+            <button onclick="navigateTo('foryou'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-bold text-xs text-slate-700 dark:text-slate-200">For You</button>
+            <button onclick="navigateTo('pengumuman'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-bold text-xs text-slate-700 dark:text-slate-200">Pengumuman</button>
+            <button onclick="navigateTo('blog'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-bold text-xs text-slate-700 dark:text-slate-200">Blog</button>
+            <button onclick="navigateTo('memory'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-bold text-xs text-slate-700 dark:text-slate-200">Memory Of Tamvesta</button>
+            <button onclick="navigateTo('prestasi'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-bold text-xs text-slate-700 dark:text-slate-200">Prestasi</button>
+            <button onclick="navigateTo('kegiatan'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-bold text-xs text-slate-700 dark:text-slate-200">Kegiatan</button>
+            <button onclick="navigateTo('download'); toggleMobileMenu()" class="w-full text-left px-3 py-2 rounded-lg font-bold text-xs text-slate-700 dark:text-slate-200">Download Center</button>
+        </div>
+    </nav>
+
+    <!-- Breaking News Ticker Bar -->
+    <div class="bg-slate-900 text-slate-100 py-2.5 px-4 border-b border-slate-800 flex items-center overflow-hidden shadow-inner">
+        <span class="bg-rose-600 text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider mr-3 shrink-0 flex items-center gap-1.5 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-white animate-ping"></span> BREAKING NEWS
+        </span>
+        <div class="overflow-hidden whitespace-nowrap w-full marquee-container">
+            <div id="breakingNewsMarquee" class="marquee-content text-xs font-semibold text-slate-300">
+                Pendaftaran Penerimaan Peserta Didik Baru (PPDB) TAMVESTA Tahun Ajaran 2026/2027 Resmi Dibuka! --- Tim Robotik Tamvesta Raih Juara 1 Tingkat Nasional --- Persiapan Ujian Akhir Semester Dimulai Minggu Depan.
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT VIEW ROUTER -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- 1. VIEW: FOR YOU (HERO & HIGHLIGHTS) -->
+        <section id="view-foryou" class="space-y-8">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Featured News -->
+                <div id="heroNewsCard" class="lg:col-span-2 group relative rounded-3xl overflow-hidden shadow-xl bg-slate-950 min-h-[420px] flex flex-col justify-end p-6 sm:p-8 cursor-pointer" onclick="openNewsDetail(1)">
+                    <img id="heroImg" src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80" alt="Tamvesta Hero" class="absolute inset-0 w-full h-full object-cover opacity-65 group-hover:scale-105 transition-transform duration-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
+                    <div class="relative z-10 space-y-3">
+                        <span class="px-3 py-1 bg-sky-500 text-white font-extrabold text-[10px] uppercase tracking-wider rounded-md">Berita Utama</span>
+                        <h1 id="heroTitle" class="text-2xl sm:text-4xl font-extrabold text-white group-hover:text-sky-300 transition-colors leading-tight">
+                            Prestasi Gemilang! Tim Sains & Robotik TAMVESTA Raih Medali Emas di Ajang Nasional
+                        </h1>
+                        <p id="heroExcerpt" class="text-slate-300 text-xs sm:text-sm line-clamp-2 leading-relaxed">
+                            Inovasi alat penyaring air otomatis dan sistem AI ramah lingkungan buatan siswa Tamvesta berhasil mengalahkan puluhan tim dari berbagai provinsi.
+                        </p>
+                        <div class="flex items-center space-x-4 text-xs text-slate-400 pt-2 border-t border-slate-700/60">
+                            <span><i class="fa-regular fa-clock mr-1"></i> <span id="heroTime">10 Menit Lalu</span></span>
+                            <span><i class="fa-regular fa-user mr-1"></i> Redaksi Tamvesta</span>
+                            <span><i class="fa-regular fa-eye mr-1"></i> 1,420 Views</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular / Trending Widget -->
+                <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-700 mb-4">
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-base flex items-center gap-2">
+                                <i class="fa-solid fa-fire text-amber-500"></i> Berita Terpopuler
+                            </h3>
+                            <span class="text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded">Trending</span>
+                        </div>
+                        <div id="popularStoriesList" class="space-y-4">
+                            <!-- Rendered via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories Filter & Search -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div class="flex items-center space-x-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 custom-scrollbar">
+                    <button onclick="filterMainCategory('All')" class="main-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-tamvesta-600 text-white" data-cat="All">Semua Berita</button>
+                    <button onclick="filterMainCategory('Akademik')" class="main-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" data-cat="Akademik">Akademik</button>
+                    <button onclick="filterMainCategory('Ekstrakurikuler')" class="main-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" data-cat="Ekstrakurikuler">Ekstrakurikuler</button>
+                    <button onclick="filterMainCategory('Pengumuman')" class="main-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" data-cat="Pengumuman">Pengumuman</button>
+                    <button onclick="filterMainCategory('Artikel')" class="main-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" data-cat="Artikel">Artikel</button>
+                </div>
+                <div class="relative w-full sm:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="mainSearchInput" oninput="renderMainNewsGrid()" placeholder="Cari berita sekolah..." class="w-full pl-9 pr-4 py-2 rounded-xl text-xs border border-slate-200 dark:border-slate-700 dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-tamvesta-500">
+                </div>
+            </div>
+
+            <!-- News Grid -->
+            <div id="mainNewsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- 2. VIEW: PENGUMUMAN -->
+        <section id="view-pengumuman" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-tamvesta-700 to-sky-600 text-white rounded-3xl p-8 shadow-md">
+                <span class="bg-white/20 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider">Papan Informasi Resmi</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mt-2">Pengumuman Sekolah TAMVESTA</h2>
+                <p class="text-xs text-sky-100 mt-1">Informasi penting terkait akademik, kalender sekolah, dan kebijakan terbaru.</p>
+            </div>
+            <div id="pengumumanList" class="space-y-4"></div>
+        </section>
+
+        <!-- 3. VIEW: BLOG -->
+        <section id="view-blog" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <span class="bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 px-3 py-1 rounded-md text-[10px] font-bold uppercase">Karya & Literasi</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">Blog & Artikel Siswa</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Ruang tulisan, opini, serta literasi kreatif dari para siswa dan guru TAMVESTA.</p>
+            </div>
+            <div id="blogGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+
+        <!-- 4. VIEW: MEMORY OF TAMVESTA -->
+        <section id="view-memory" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <span class="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-3 py-1 rounded-md text-[10px] font-bold uppercase">Galeri Kenangan</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">Memory Of Tamvesta</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Dokumentasi momen berharga, kegiatan seremoni, dan kenangan indah sekolah.</p>
+            </div>
+            <div id="memoryGalleryGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- 5. VIEW: PRESTASI -->
+        <section id="view-prestasi" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <span class="bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 px-3 py-1 rounded-md text-[10px] font-bold uppercase">Kebanggaan Sekolah</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">Daftar Prestasi TAMVESTA</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Pencapaian luar biasa siswa-siswi dalam bidang akademik, olahraga, dan seni.</p>
+            </div>
+            <div id="prestasiGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- 6. VIEW: KEGIATAN -->
+        <section id="view-kegiatan" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <span class="bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300 px-3 py-1 rounded-md text-[10px] font-bold uppercase">Agenda Sekolah</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">Jadwal & Agenda Kegiatan</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Kalender kegiatan, perlombaan, ujian, dan acara mendatang.</p>
+            </div>
+            <div id="kegiatanList" class="space-y-4"></div>
+        </section>
+
+        <!-- 7. VIEW: DOWNLOAD CENTER -->
+        <section id="view-download" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <span class="bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300 px-3 py-1 rounded-md text-[10px] font-bold uppercase">Berkas & Dokumen</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">Download Center</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Unduh formulir pendaftaran, modul pembelajaran, dan panduan sekolah.</p>
+            </div>
+            <div id="downloadCenterGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- 8. VIEW: CUSTOM PAGE (ADMIN GENERATED) -->
+        <section id="view-custom-page" class="hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <span class="bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300 px-3 py-1 rounded-md text-[10px] font-bold uppercase">Halaman Khusus</span>
+                <h1 id="customPageTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">Judul Halaman Custom</h1>
+                <div id="customPageContent" class="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 text-sm leading-relaxed pt-4 border-t border-slate-200 dark:border-slate-700"></div>
+            </div>
+        </section>
+
+        <!-- 9. VIEW: DASHBOARD (ADMIN & USER) -->
+        <section id="view-dashboard" class="hidden space-y-8">
+            <div class="bg-gradient-to-r from-tamvesta-700 to-sky-700 text-white rounded-3xl p-6 sm:p-8 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <span id="dashRoleBadge" class="bg-amber-400 text-slate-900 text-[10px] font-black uppercase px-2.5 py-0.5 rounded">Role: Admin Utama</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold mt-1" id="dashWelcomeTitle">Selamat Datang, Admin Tamansiswa!</h2>
+                    <p class="text-xs text-sky-100 mt-1">Kelola konten berita, pengumuman, galeri, dan statistik portal berita TAMVESTA.</p>
+                </div>
+                <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow-sm">
+                    <i class="fa-solid fa-right-from-bracket mr-1.5"></i>Keluar (Logout)
+                </button>
+            </div>
+
+            <!-- ADMIN CMS DASHBOARD MENU TABS & PANELS -->
+            <div id="adminPanelContainer" class="space-y-6">
+                <div class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar border-b border-slate-200 dark:border-slate-700">
+                    <button onclick="switchDashTab('overview')" id="dashtab-overview" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-tamvesta-600 text-white">Overview & Analitik</button>
+                    <button onclick="switchDashTab('berita')" id="dashtab-berita" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Berita</button>
+                    <button onclick="switchDashTab('pengumuman')" id="dashtab-pengumuman" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Pengumuman</button>
+                    <button onclick="switchDashTab('blog')" id="dashtab-blog" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Blog</button>
+                    <button onclick="switchDashTab('memory')" id="dashtab-memory" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Memory</button>
+                    <button onclick="switchDashTab('prestasi')" id="dashtab-prestasi" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Prestasi</button>
+                    <button onclick="switchDashTab('kegiatan')" id="dashtab-kegiatan" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Kegiatan</button>
+                    <button onclick="switchDashTab('download')" id="dashtab-download" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Download</button>
+                    <button onclick="switchDashTab('ticker')" id="dashtab-ticker" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Running Text</button>
+                    <button onclick="switchDashTab('custompage')" id="dashtab-custompage" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Halaman Kosong Custom</button>
+                    <button onclick="switchDashTab('users')" id="dashtab-users" class="dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Kelola Pengguna</button>
+                </div>
+
+                <!-- SUB-VIEW 1: OVERVIEW & ANALYTICS -->
+                <div id="dash-sub-overview" class="dashtab-content space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <span class="text-xs font-medium text-slate-400">Total Pembaca Berita</span>
+                            <div class="text-2xl font-black text-slate-800 dark:text-white mt-1" id="dashMetricViews">14,250</div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <span class="text-xs font-medium text-slate-400">Total Pengumuman</span>
+                            <div class="text-2xl font-black text-slate-800 dark:text-white mt-1" id="dashMetricAnnounce">8</div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <span class="text-xs font-medium text-slate-400">Jumlah Galeri Foto</span>
+                            <div class="text-2xl font-black text-slate-800 dark:text-white mt-1" id="dashMetricMemory">12</div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <span class="text-xs font-medium text-slate-400">Pengguna Terdaftar</span>
+                            <div class="text-2xl font-black text-slate-800 dark:text-white mt-1" id="dashMetricUsers">2</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-sm mb-4">Grafik Pengunjung Portal Minggu Ini</h3>
+                        <div class="h-64">
+                            <canvas id="adminChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 2: KELOLA BERITA -->
+                <div id="dash-sub-berita" class="dashtab-content hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">Daftar Berita Utama</h3>
+                        <button onclick="openModalCreateNews()" class="bg-tamvesta-600 hover:bg-tamvesta-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition">
+                            <i class="fa-solid fa-plus mr-1"></i>Tambah Berita Baru
+                        </button>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-300 font-bold">
+                                <tr>
+                                    <th class="p-3">Judul Berita</th>
+                                    <th class="p-3">Kategori</th>
+                                    <th class="p-3">Tanggal</th>
+                                    <th class="p-3">Views</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashNewsTable" class="divide-y divide-slate-200 dark:divide-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 3: KELOLA PENGUMUMAN -->
+                <div id="dash-sub-pengumuman" class="dashtab-content hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="font-bold text-slate-800 dark:text-white text-base">Manajemen Pengumuman</h3>
+                            <p class="text-xs text-slate-500">Tambah pengumuman, toggle status aktif, atau hapus data.</p>
+                        </div>
+                        <button onclick="openModalAddPengumuman()" class="bg-tamvesta-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-tamvesta-700 transition">
+                            <i class="fa-solid fa-plus mr-1"></i>Tambah Pengumuman
+                        </button>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 dark:bg-slate-700 font-bold">
+                                <tr>
+                                    <th class="p-3">Judul Pengumuman</th>
+                                    <th class="p-3">Prioritas</th>
+                                    <th class="p-3">Tanggal</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashPengumumanTable" class="divide-y divide-slate-200 dark:divide-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 4: KELOLA BLOG -->
+                <div id="dash-sub-blog" class="dashtab-content hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">Artikel Blog Sekolah</h3>
+                        <button onclick="openModalAddBlog()" class="bg-purple-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-purple-700">
+                            <i class="fa-solid fa-plus mr-1"></i>Tulis Blog Baru
+                        </button>
+                    </div>
+                    <div id="dashBlogList" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                </div>
+
+                <!-- SUB-VIEW 5: KELOLA MEMORY -->
+                <div id="dash-sub-memory" class="dashtab-content hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">Kelola Memory Of Tamvesta</h3>
+                        <button onclick="openModalAddMemory()" class="bg-amber-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-amber-700">
+                            <i class="fa-solid fa-plus mr-1"></i>Tambah Photo Memory
+                        </button>
+                    </div>
+                    <div id="dashMemoryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+                </div>
+
+                <!-- SUB-VIEW 6: KELOLA PRESTASI -->
+                <div id="dash-sub-prestasi" class="dashtab-content hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">Pencapaian & Prestasi Siswa</h3>
+                        <button onclick="openModalAddPrestasi()" class="bg-emerald-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700">
+                            <i class="fa-solid fa-plus mr-1"></i>Catat Prestasi Baru
+                        </button>
+                    </div>
+                    <div id="dashPrestasiList" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                </div>
+
+                <!-- SUB-VIEW 7: KELOLA KEGIATAN -->
+                <div id="dash-sub-kegiatan" class="dashtab-content hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">Agenda & Kalender Kegiatan</h3>
+                        <button onclick="openModalAddKegiatan()" class="bg-blue-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-blue-700">
+                            <i class="fa-solid fa-plus mr-1"></i>Tambah Kegiatan
+                        </button>
+                    </div>
+                    <div id="dashKegiatanList" class="space-y-3"></div>
+                </div>
+
+                <!-- SUB-VIEW 8: KELOLA DOWNLOAD -->
+                <div id="dash-sub-download" class="dashtab-content hidden space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">Berkas Download Center</h3>
+                        <button onclick="openModalAddDownload()" class="bg-teal-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold hover:bg-teal-700">
+                            <i class="fa-solid fa-plus mr-1"></i>Tambah File Unduhan
+                        </button>
+                    </div>
+                    <div id="dashDownloadList" class="space-y-3"></div>
+                </div>
+
+                <!-- SUB-VIEW 9: KELOLA TICKER -->
+                <div id="dash-sub-ticker" class="dashtab-content hidden space-y-4">
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+                        <h3 class="font-bold text-slate-800 dark:text-white text-base">Pengaturan Running Text (Breaking News)</h3>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Teks Berjalan Saat Ini:</label>
+                            <textarea id="tickerInput" rows="3" class="w-full p-3 border border-slate-200 dark:border-slate-700 dark:bg-slate-900 rounded-xl text-xs focus:ring-2 focus:ring-tamvesta-500"></textarea>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="saveTickerText()" class="bg-tamvesta-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-tamvesta-700">
+                                Update Breaking News
+                            </button>
+                            <button onclick="clearTickerText()" class="bg-rose-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-700">
+                                <i class="fa-solid fa-trash mr-1"></i>Kosongkan Running Text
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 10: CUSTOM PAGE BUILDER -->
+                <div id="dash-sub-custompage" class="dashtab-content hidden space-y-4">
+                    <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-slate-800 dark:text-white text-base">Page Builder Halaman Kosong (Custom Admin)</h3>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="toggleCustomPageVisibility()" id="btnToggleCustomPageNav" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 text-slate-700">Sembunyikan dari Navbar</button>
+                                <button onclick="deleteCustomPage()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white"><i class="fa-solid fa-trash mr-1"></i>Hapus Halaman Custom</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Judul Halaman:</label>
+                            <input type="text" id="customPageTitleInput" placeholder="Contoh: Profil Khusus Tamansiswa" class="w-full p-2.5 border rounded-xl text-xs dark:bg-slate-900 dark:border-slate-700">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold mb-1">Isi Konten (Dukungan Format HTML / Teks):</label>
+                            <textarea id="customPageContentInput" rows="8" placeholder="Tuliskan konten atau kode HTML sederhana..." class="w-full p-3 border rounded-xl text-xs dark:bg-slate-900 dark:border-slate-700"></textarea>
+                        </div>
+                        <button onclick="saveCustomPage()" class="bg-purple-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-purple-700">
+                            Simpan & Terbitkan Halaman Custom
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 11: KELOLA PENGGUNA -->
+                <div id="dash-sub-users" class="dashtab-content hidden space-y-4">
+                    <h3 class="font-bold text-slate-800 dark:text-white text-base">Pengguna Terdaftar & Log Login</h3>
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 dark:bg-slate-700 font-bold">
+                                <tr>
+                                    <th class="p-3">Nama</th>
+                                    <th class="p-3">Username</th>
+                                    <th class="p-3">Role</th>
+                                    <th class="p-3">Log Login Terakhir</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashUsersTable" class="divide-y divide-slate-200 dark:divide-slate-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL: LOGIN / REGISTER -->
+    <div id="loginModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 dark:border-slate-700 relative">
+            <button onclick="closeLoginModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+            <!-- Login Form -->
+            <div id="loginFormBlock" class="space-y-4">
+                <div class="text-center space-y-1">
+                    <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Masuk ke TAMVESTA</h3>
+                    <p class="text-xs text-slate-500">Masukan username & password Anda.</p>
+                </div>
+
+                <form onsubmit="handleLoginSubmit(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold mb-1">Username / ID</label>
+                        <input type="text" id="loginUsername" required placeholder="Masukan Username" class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-tamvesta-500">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Password</label>
+                        <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-tamvesta-500">
+                    </div>
+                    <button type="submit" class="w-full bg-tamvesta-600 hover:bg-tamvesta-700 text-white font-bold py-2.5 rounded-xl transition shadow-md">
+                        Masuk Sekarang
+                    </button>
+                </form>
+
+                <p class="text-center text-xs text-slate-500">
+                    Belum punya akun? <button onclick="toggleAuthMode('register')" class="text-tamvesta-600 font-bold hover:underline">Daftar Akun Baru</button>
+                </p>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerFormBlock" class="hidden space-y-4">
+                <div class="text-center space-y-1">
+                    <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">Pendaftaran Pengguna</h3>
+                    <p class="text-xs text-slate-500">Buat akun siswa atau anggota Tamvesta.</p>
+                </div>
+
+                <form onsubmit="handleRegisterSubmit(event)" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold mb-1">Nama Lengkap</label>
+                        <input type="text" id="regName" required placeholder="Nama Anda" class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Username Baru</label>
+                        <input type="text" id="regUsername" required placeholder="Username unik" class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block font-bold mb-1">Password</label>
+                        <input type="password" id="regPassword" required placeholder="••••••••" class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl transition">
+                        Daftar Akun Baru
+                    </button>
+                </form>
+
+                <p class="text-center text-xs text-slate-500">
+                    Sudah terdaftar? <button onclick="toggleAuthMode('login')" class="text-tamvesta-600 font-bold hover:underline">Masuk Kembali</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NEWS DETAIL VIEW -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 relative space-y-6 custom-scrollbar border border-slate-200 dark:border-slate-700">
+            <button onclick="closeDetailModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+
+            <span id="detailCat" class="px-3 py-1 bg-tamvesta-50 text-tamvesta-700 dark:bg-slate-700 dark:text-sky-300 font-bold text-xs rounded-md">Kategori</span>
+            <h1 id="detailTitle" class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-white">Judul Berita Lengkap</h1>
+
+            <div class="flex items-center justify-between border-y border-slate-200 dark:border-slate-700 py-3 text-xs text-slate-500">
+                <div class="space-x-3">
+                    <span id="detailAuthor"><i class="fa-regular fa-user mr-1"></i> Author</span>
+                    <span id="detailDate"><i class="fa-regular fa-calendar mr-1"></i> Date</span>
+                </div>
+                <button onclick="toggleTextToSpeech()" id="btnTTS" class="flex items-center space-x-1.5 bg-sky-50 text-sky-700 dark:bg-slate-700 dark:text-sky-300 px-3 py-1.5 rounded-lg font-bold">
+                    <i class="fa-solid fa-volume-high"></i> <span id="ttsLabel">Dengarkan Baca Berita</span>
+                </button>
+            </div>
+
+            <img id="detailImg" src="" alt="News Detail Cover" class="w-full h-64 sm:h-80 object-cover rounded-2xl shadow-sm">
+
+            <div id="detailContent" class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: GENERIC ADD / EDIT ITEM (NEWS / ANNOUNCEMENT / ETC) -->
+    <div id="crudModal" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 relative space-y-4 border border-slate-200 dark:border-slate-700">
+            <button onclick="closeCrudModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h3 id="crudModalTitle" class="text-xl font-extrabold text-slate-800 dark:text-white">Tambah Data Baru</h3>
+
+            <form id="genericCrudForm" onsubmit="handleCrudSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="crudType">
+                <div>
+                    <label class="block font-bold mb-1">Judul / Nama Item</label>
+                    <input type="text" id="crudTitle" required class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Kategori / Keterangan Tambahan</label>
+                    <input type="text" id="crudCategory" placeholder="Contoh: Akademik / Penting" class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">URL Gambar (Opsional)</label>
+                    <input type="url" id="crudImage" placeholder="https://images.unsplash.com/..." class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700">
+                </div>
+                <div>
+                    <label class="block font-bold mb-1">Isi Pesan / Deskripsi Lengkap</label>
+                    <textarea id="crudContent" rows="4" required class="w-full p-2.5 border rounded-xl dark:bg-slate-900 dark:border-slate-700"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-tamvesta-600 text-white font-bold py-2.5 rounded-xl hover:bg-tamvesta-700 transition">
+                    Simpan & Terbitkan Data
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl text-xs font-bold flex items-center space-x-2">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toastMsg">Pesan Toast</span>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // State Management
+        let appState = {
+            currentUser: JSON.parse(localStorage.getItem('tamvesta_user')) || null,
+            users: JSON.parse(localStorage.getItem('tamvesta_users_db')) || [
+                { name: 'Admin Tamansiswa', username: 'Tamansiswa', role: 'admin', lastLogin: '19 Sep 2026 13:45' },
+                { name: 'Siswa Contoh', username: 'siswa', role: 'user', lastLogin: '19 Sep 2026 10:20' }
+            ],
+            news: [
+                { id: 1, title: 'Prestasi Gemilang! Tim Sains & Robotik TAMVESTA Raih Medali Emas di Ajang Nasional', category: 'Akademik', date: '19 Sep 2026', views: 1420, author: 'Redaksi Tamvesta', image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80', content: 'Inovasi alat penyaring air otomatis dan sistem AI ramah lingkungan buatan siswa Tamvesta berhasil mengalahkan puluhan tim dari berbagai provinsi.' },
+                { id: 2, title: 'Penerimaan Peserta Didik Baru (PPDB) TAMVESTA Ajaran 2026/2027 Resmi Dibuka', category: 'Pengumuman', date: '18 Sep 2026', views: 980, author: 'Panitia PPDB', image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80', content: 'Nikmati beasiswa jalur prestasi dan fasilitas laboratorium teknologi modern di kampus Tamvesta Batam.' },
+                { id: 3, title: 'Kemah Pramuka & Bakti Sosial Siswa Tamansiswa di Kawasan Kepulauan Riau', category: 'Ekstrakurikuler', date: '17 Sep 2026', views: 650, author: 'Humas Sekolah', image: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=800&q=80', content: 'Siswa-siswi aktif menanam pohon mangrove dan membersihkan pesisir pantai sebagai wujud kepedulian lingkungan.' }
+            ],
+            announcements: [
+                { id: 1, title: 'Pelaksanaan Ujian Akhir Semester (UAS) Genap', priority: 'Penting', date: '19 Sep 2026', content: 'Seluruh siswa diharapkan mempersiapkan kartu ujian dan hadir tepat waktu mulai pukul 07.30 WIB.', active: true },
+                { id: 2, title: 'Jadwal Pendataan Beasiswa Kebudayaan', priority: 'Terbaru', date: '18 Sep 2026', content: 'Pengumpulan berkas dapat dilakukan melalui bagian administrasi sekolah sampai akhir bulan ini.', active: true }
+            ],
+            blogs: [
+                { id: 1, title: 'Pentingnya Literasi Digital Bagi Remaja di Era Kecerdasan Buatan', author: 'Siti Rahma (Siswa Class XII)', category: 'Opini', content: 'Literasi digital bukan sekadar kemampuan menggunakan gadget, melainkan cara memfilter informasi valid.' }
+            ],
+            memories: [
+                { id: 1, title: 'Upacara Peringatan Hari Pendidikan Nasional', image: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&w=800&q=80' },
+                { id: 2, title: 'Pentas Seni & Budaya Tamvesta', image: 'https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=800&q=80' }
+            ],
+            prestasi: [
+                { id: 1, title: 'Juara 1 Olimpiade Fisika Kota Batam', name: 'Ahmad Rizky', category: 'Akademik' }
+            ],
+            kegiatan: [
+                { id: 1, title: 'Workshop AI for Education', date: '25 Sep 2026', location: 'Aula Utama Tamvesta' }
+            ],
+            downloads: [
+                { id: 1, title: 'Formulir Pendaftaran PPDB 2026 (PDF)', size: '1.2 MB' }
+            ],
+            tickerText: 'Pendaftaran Penerimaan Peserta Didik Baru (PPDB) TAMVESTA Tahun Ajaran 2026/2027 Resmi Dibuka! --- Tim Robotik Tamvesta Raih Juara 1 Tingkat Nasional --- Persiapan Ujian Akhir Semester Dimulai Minggu Depan.',
+            customPage: {
+                visible: false,
+                title: 'Halaman Khusus Tamansiswa',
+                content: '<p>Ini adalah halaman custom yang diolah secara mandiri oleh Admin TAMVESTA.</p>'
+            }
+        };
+
+        let activeMainCat = 'All';
+        let isTtsActive = false;
+        let speechSynth = window.speechSynthesis;
+        let adminChartInstance = null;
+
+        // Init App
+        window.onload = function() {
+            updateAuthUI();
+            renderMainNewsGrid();
+            renderPopularStories();
+            renderPengumumanView();
+            renderBlogView();
+            renderMemoryView();
+            renderPrestasiView();
+            renderKegiatanView();
+            renderDownloadView();
+            renderCustomPageView();
+            document.getElementById('breakingNewsMarquee').innerText = appState.tickerText;
+            document.getElementById('tickerInput').value = appState.tickerText;
+        };
+
+        // Navigation Router
+        function navigateTo(viewId) {
+            const views = ['foryou', 'pengumuman', 'blog', 'memory', 'prestasi', 'kegiatan', 'download', 'custom-page', 'dashboard'];
+            views.forEach(v => {
+                const el = document.getElementById(`view-${v}`);
+                if (el) el.classList.add('hidden');
+                const navBtn = document.getElementById(`nav-${v}`);
+                if (navBtn) {
+                    navBtn.className = "nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-slate-600 dark:text-slate-300 hover:text-tamvesta-600";
+                }
+            });
+
+            const activeEl = document.getElementById(`view-${viewId}`);
+            if (activeEl) activeEl.classList.remove('hidden');
+
+            const activeNav = document.getElementById(`nav-${viewId}`);
+            if (activeNav) {
+                activeNav.className = "nav-link px-3.5 py-2 rounded-xl text-xs font-bold transition text-tamvesta-600 bg-tamvesta-50 dark:bg-slate-700";
+            }
+
+            if (viewId === 'dashboard') {
+                renderDashboardContent();
+            }
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            document.getElementById('themeIcon').className = isDark ? "fa-solid fa-sun text-amber-300" : "fa-solid fa-moon";
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        // Auth Logic
+        function updateAuthUI() {
+            const container = document.getElementById('authContainer');
+            if (appState.currentUser) {
+                container.innerHTML = `
+                    <button onclick="navigateTo('dashboard')" class="bg-tamvesta-600 text-white px-3.5 py-2 rounded-xl text-xs font-bold shadow-sm hover:bg-tamvesta-700 flex items-center gap-1.5">
+                        <i class="fa-solid fa-gauge-high"></i> Dashboard
+                    </button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button onclick="openLoginModal()" class="bg-tamvesta-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-tamvesta-700 transition">
+                        <i class="fa-solid fa-right-to-bracket mr-1"></i> Login / Register
+                    </button>
+                `;
+            }
+        }
+
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.remove('hidden');
+        }
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+        function toggleAuthMode(mode) {
+            if (mode === 'register') {
+                document.getElementById('loginFormBlock').classList.add('hidden');
+                document.getElementById('registerFormBlock').classList.remove('hidden');
+            } else {
+                document.getElementById('registerFormBlock').classList.add('hidden');
+                document.getElementById('loginFormBlock').classList.remove('hidden');
+            }
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const u = document.getElementById('loginUsername').value.trim();
+            const p = document.getElementById('loginPassword').value.trim();
+
+            if (u === 'Tamansiswa' && p === 'Salamdanbahagia') {
+                appState.currentUser = { name: 'Admin Tamansiswa', username: 'Tamansiswa', role: 'admin' };
+                localStorage.setItem('tamvesta_user', JSON.stringify(appState.currentUser));
+                updateAuthUI();
+                closeLoginModal();
+                showToast("Selamat datang, Admin Tamansiswa!");
+                navigateTo('dashboard');
+                return;
+            }
+
+            const found = appState.users.find(usr => usr.username === u);
+            if (found) {
+                appState.currentUser = found;
+                localStorage.setItem('tamvesta_user', JSON.stringify(appState.currentUser));
+                updateAuthUI();
+                closeLoginModal();
+                showToast(`Selamat datang kembali, ${found.name}!`);
+                navigateTo('dashboard');
+            } else {
+                showToast("Username/Password tidak terdaftar!", "error");
+            }
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const username = document.getElementById('regUsername').value.trim();
+            const newUser = { name, username, role: 'user', lastLogin: 'Baru saja' };
+            appState.users.push(newUser);
+            localStorage.setItem('tamvesta_users_db', JSON.stringify(appState.users));
+            appState.currentUser = newUser;
+            localStorage.setItem('tamvesta_user', JSON.stringify(newUser));
+            updateAuthUI();
+            closeLoginModal();
+            showToast("Pendaftaran berhasil! Selamat bergabung.");
+            navigateTo('dashboard');
+        }
+
+        function handleLogout() {
+            appState.currentUser = null;
+            localStorage.removeItem('tamvesta_user');
+            updateAuthUI();
+            showToast("Anda telah keluar akun.");
+            navigateTo('foryou');
+        }
+
+        // Render Views
+        function filterMainCategory(cat) {
+            activeMainCat = cat;
+            document.querySelectorAll('.main-cat-btn').forEach(btn => {
+                if (btn.dataset.cat === cat) {
+                    btn.className = "main-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-tamvesta-600 text-white";
+                } else {
+                    btn.className = "main-cat-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300";
+                }
+            });
+            renderMainNewsGrid();
+        }
+
+        function renderMainNewsGrid() {
+            const grid = document.getElementById('mainNewsGrid');
+            const search = document.getElementById('mainSearchInput').value.toLowerCase();
+
+            const filtered = appState.news.filter(n => {
+                const matchCat = (activeMainCat === 'All' || n.category === activeMainCat);
+                const matchSearch = n.title.toLowerCase().includes(search) || n.content.toLowerCase().includes(search);
+                return matchCat && matchSearch;
+            });
+
+            if (!filtered.length) {
+                grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-xs">Tidak ada berita yang sesuai.</div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => `
+                <div onclick="openNewsDetail(${item.id})" class="bg-white dark:bg-slate-800 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition cursor-pointer flex flex-col justify-between">
+                    <div>
+                        <div class="h-44 relative overflow-hidden">
+                            <img src="${item.image}" alt="${item.title}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-sky-300 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase">
+                                ${item.category}
+                            </span>
+                        </div>
+                        <div class="p-5 space-y-2">
+                            <div class="text-[11px] text-slate-400 flex items-center justify-between">
+                                <span><i class="fa-regular fa-calendar mr-1"></i>${item.date}</span>
+                                <span><i class="fa-regular fa-eye mr-1"></i>${item.views} views</span>
+                            </div>
+                            <h3 class="font-extrabold text-slate-800 dark:text-white text-sm hover:text-tamvesta-600 transition line-clamp-2">
+                                ${item.title}
+                            </h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                ${item.content}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPopularStories() {
+            const list = document.getElementById('popularStoriesList');
+            if (!list) return;
+            list.innerHTML = appState.news.slice().sort((a,b) => b.views - a.views).map((item, idx) => `
+                <div onclick="openNewsDetail(${item.id})" class="flex items-center space-x-3 cursor-pointer group">
+                    <span class="text-base font-black text-slate-300 dark:text-slate-600 group-hover:text-tamvesta-600">0${idx + 1}</span>
+                    <div class="space-y-0.5">
+                        <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-tamvesta-600 line-clamp-1">${item.title}</h4>
+                        <span class="text-[10px] text-slate-400">${item.views} pembaca</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openNewsDetail(id) {
+            const item = appState.news.find(n => n.id === id);
+            if (!item) return;
+            item.views += 1;
+            document.getElementById('detailCat').innerText = item.category;
+            document.getElementById('detailTitle').innerText = item.title;
+            document.getElementById('detailAuthor').innerHTML = `<i class="fa-regular fa-user mr-1"></i> ${item.author}`;
+            document.getElementById('detailDate').innerHTML = `<i class="fa-regular fa-calendar mr-1"></i> ${item.date}`;
+            document.getElementById('detailImg').src = item.image;
+            document.getElementById('detailContent').innerText = item.content;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() {
+            if (speechSynth.speaking) speechSynth.cancel();
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        function toggleTextToSpeech() {
+            if (speechSynth.speaking) {
+                speechSynth.cancel();
+                document.getElementById('ttsLabel').innerText = "Dengarkan Baca Berita";
+            } else {
+                const text = document.getElementById('detailTitle').innerText + ". " + document.getElementById('detailContent').innerText;
+                const ut = new SpeechSynthesisUtterance(text);
+                ut.lang = 'id-ID';
+                ut.onend = () => document.getElementById('ttsLabel').innerText = "Dengarkan Baca Berita";
+                speechSynth.speak(ut);
+                document.getElementById('ttsLabel').innerText = "Hentikan Suara";
+            }
+        }
+
+        // Dashboard Tabs & Subviews Logic
+        function renderDashboardContent() {
+            if (!appState.currentUser) return;
+            document.getElementById('dashWelcomeTitle').innerText = `Selamat Datang, ${appState.currentUser.name}!`;
+            document.getElementById('dashRoleBadge').innerText = `Role: ${appState.currentUser.role.toUpperCase()}`;
+            
+            renderDashSubOverview();
+            renderDashSubBerita();
+            renderDashSubPengumuman();
+            renderDashSubBlog();
+            renderDashSubMemory();
+            renderDashSubPrestasi();
+            renderDashSubKegiatan();
+            renderDashSubDownload();
+            renderDashSubUsers();
+        }
+
+        function switchDashTab(tabKey) {
+            document.querySelectorAll('.dashtab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.dashtab-btn').forEach(btn => {
+                btn.className = "dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300";
+            });
+
+            document.getElementById(`dash-sub-${tabKey}`).classList.remove('hidden');
+            document.getElementById(`dashtab-${tabKey}`).className = "dashtab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-tamvesta-600 text-white";
+        }
+
+        function renderDashSubOverview() {
+            document.getElementById('dashMetricViews').innerText = appState.news.reduce((a,b)=>a+b.views, 0);
+            document.getElementById('dashMetricAnnounce').innerText = appState.announcements.length;
+            document.getElementById('dashMetricMemory').innerText = appState.memories.length;
+            document.getElementById('dashMetricUsers').innerText = appState.users.length;
+
+            const ctx = document.getElementById('adminChart');
+            if (adminChartInstance) adminChartInstance.destroy();
+            adminChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
+                    datasets: [{ label: 'Pengunjung', data: [850, 1200, 950, 1400, 1800, 2100, 1950], backgroundColor: '#0284c7' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // Render Functions with DELETE Controls Attached
+        function renderDashSubBerita() {
+            const tbody = document.getElementById('dashNewsTable');
+            if (!appState.news.length) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada berita.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = appState.news.map(item => `
+                <tr>
+                    <td class="p-3 font-bold">${item.title}</td>
+                    <td class="p-3">${item.category}</td>
+                    <td class="p-3">${item.date}</td>
+                    <td class="p-3 font-semibold text-sky-600">${item.views}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteNewsItem(${item.id})" class="text-rose-600 hover:text-rose-800 font-bold transition flex items-center justify-center gap-1 mx-auto">
+                            <i class="fa-solid fa-trash"></i> Hapus
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderDashSubPengumuman() {
+            const tbody = document.getElementById('dashPengumumanTable');
+            if (!appState.announcements.length) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Belum ada pengumuman.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = appState.announcements.map(item => `
+                <tr>
+                    <td class="p-3 font-bold">${item.title}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">${item.priority}</span></td>
+                    <td class="p-3">${item.date}</td>
+                    <td class="p-3">
+                        <button onclick="togglePengumumanStatus(${item.id})" class="px-2.5 py-1 rounded-md font-bold ${item.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">
+                            ${item.active ? 'Aktif' : 'Non-Aktif'}
+                        </button>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="deletePengumumanItem(${item.id})" class="text-rose-600 hover:text-rose-800 font-bold transition flex items-center justify-center gap-1 mx-auto">
+                            <i class="fa-solid fa-trash"></i> Hapus
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderDashSubBlog() {
+            const list = document.getElementById('dashBlogList');
+            if (!appState.blogs.length) {
+                list.innerHTML = `<div class="col-span-full py-4 text-slate-400 text-xs text-center">Belum ada artikel blog.</div>`;
+                return;
+            }
+            list.innerHTML = appState.blogs.map(b => `
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs space-y-2 flex justify-between items-start">
+                    <div>
+                        <span class="text-[10px] bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded">${b.category}</span>
+                        <h4 class="font-bold text-slate-800 dark:text-white mt-1">${b.title}</h4>
+                        <span class="text-slate-400 block text-[11px]">Oleh: ${b.author}</span>
+                    </div>
+                    <button onclick="deleteBlogItem(${b.id})" class="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 p-1.5 rounded-lg transition" title="Hapus Artikel Blog">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderDashSubMemory() {
+            const grid = document.getElementById('dashMemoryGrid');
+            if (!appState.memories.length) {
+                grid.innerHTML = `<div class="col-span-full py-4 text-slate-400 text-xs text-center">Belum ada foto memory.</div>`;
+                return;
+            }
+            grid.innerHTML = appState.memories.map(m => `
+                <div class="bg-white dark:bg-slate-800 p-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs relative group">
+                    <img src="${m.image}" class="h-24 w-full object-cover rounded-lg">
+                    <span class="font-bold block mt-1.5 truncate text-slate-800 dark:text-white">${m.title}</span>
+                    <button onclick="deleteMemoryItem(${m.id})" class="absolute top-3 right-3 bg-rose-600 text-white p-1.5 rounded-lg shadow-md hover:bg-rose-700 transition" title="Hapus Foto">
+                        <i class="fa-solid fa-trash text-xs"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderDashSubPrestasi() {
+            const list = document.getElementById('dashPrestasiList');
+            if (!appState.prestasi.length) {
+                list.innerHTML = `<div class="col-span-full py-4 text-slate-400 text-xs text-center">Belum ada data prestasi.</div>`;
+                return;
+            }
+            list.innerHTML = appState.prestasi.map(p => `
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-800 dark:text-white">${p.title}</h4>
+                        <span class="text-slate-400">${p.name} - ${p.category}</span>
+                    </div>
+                    <button onclick="deletePrestasiItem(${p.id})" class="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 p-2 rounded-lg transition" title="Hapus Prestasi">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderDashSubKegiatan() {
+            const list = document.getElementById('dashKegiatanList');
+            if (!appState.kegiatan.length) {
+                list.innerHTML = `<div class="py-4 text-slate-400 text-xs text-center">Belum ada agenda kegiatan.</div>`;
+                return;
+            }
+            list.innerHTML = appState.kegiatan.map(k => `
+                <div class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex justify-between items-center">
+                    <div>
+                        <h4 class="font-bold text-slate-800 dark:text-white">${k.title}</h4>
+                        <span class="text-slate-400 mr-2"><i class="fa-solid fa-location-dot mr-1"></i>${k.location}</span>
+                        <span class="font-bold text-sky-600">${k.date}</span>
+                    </div>
+                    <button onclick="deleteKegiatanItem(${k.id})" class="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 p-2 rounded-lg transition" title="Hapus Kegiatan">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderDashSubDownload() {
+            const list = document.getElementById('dashDownloadList');
+            if (!appState.downloads.length) {
+                list.innerHTML = `<div class="py-4 text-slate-400 text-xs text-center">Belum ada berkas terunggah.</div>`;
+                return;
+            }
+            list.innerHTML = appState.downloads.map(d => `
+                <div class="bg-white dark:bg-slate-800 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs flex justify-between items-center">
+                    <div>
+                        <span class="font-bold text-slate-800 dark:text-white">${d.title}</span>
+                        <span class="text-slate-400 block text-[11px]">${d.size}</span>
+                    </div>
+                    <button onclick="deleteDownloadItem(${d.id})" class="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 p-2 rounded-lg transition" title="Hapus Unduhan">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function renderDashSubUsers() {
+            const tbody = document.getElementById('dashUsersTable');
+            tbody.innerHTML = appState.users.map(u => `
+                <tr>
+                    <td class="p-3 font-bold">${u.name}</td>
+                    <td class="p-3">${u.username}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 rounded ${u.role === 'admin' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'} font-bold">${u.role}</span></td>
+                    <td class="p-3">${u.lastLogin}</td>
+                    <td class="p-3 text-center">
+                        ${u.username === 'Tamansiswa' ? '<span class="text-slate-400 italic">Utama</span>' : `
+                            <button onclick="deleteUserItem('${u.username}')" class="text-rose-600 hover:text-rose-800 font-bold transition flex items-center justify-center gap-1 mx-auto">
+                                <i class="fa-solid fa-trash"></i> Hapus
+                            </button>
+                        `}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ================= DELETE ACTION HANDLERS =================
+        function deleteNewsItem(id) {
+            appState.news = appState.news.filter(n => n.id !== id);
+            renderDashSubBerita();
+            renderMainNewsGrid();
+            renderPopularStories();
+            renderDashSubOverview();
+            showToast("Berita telah dihapus.");
+        }
+
+        function deletePengumumanItem(id) {
+            appState.announcements = appState.announcements.filter(a => a.id !== id);
+            renderDashSubPengumuman();
+            renderPengumumanView();
+            renderDashSubOverview();
+            showToast("Pengumuman telah dihapus.");
+        }
+
+        function togglePengumumanStatus(id) {
+            const item = appState.announcements.find(a => a.id === id);
+            if (item) {
+                item.active = !item.active;
+                renderDashSubPengumuman();
+                renderPengumumanView();
+                showToast("Status pengumuman diubah.");
+            }
+        }
+
+        function deleteBlogItem(id) {
+            appState.blogs = appState.blogs.filter(b => b.id !== id);
+            renderDashSubBlog();
+            renderBlogView();
+            showToast("Artikel blog telah dihapus.");
+        }
+
+        function deleteMemoryItem(id) {
+            appState.memories = appState.memories.filter(m => m.id !== id);
+            renderDashSubMemory();
+            renderMemoryView();
+            renderDashSubOverview();
+            showToast("Foto memory telah dihapus.");
+        }
+
+        function deletePrestasiItem(id) {
+            appState.prestasi = appState.prestasi.filter(p => p.id !== id);
+            renderDashSubPrestasi();
+            renderPrestasiView();
+            showToast("Data prestasi telah dihapus.");
+        }
+
+        function deleteKegiatanItem(id) {
+            appState.kegiatan = appState.kegiatan.filter(k => k.id !== id);
+            renderDashSubKegiatan();
+            renderKegiatanView();
+            showToast("Agenda kegiatan telah dihapus.");
+        }
+
+        function deleteDownloadItem(id) {
+            appState.downloads = appState.downloads.filter(d => d.id !== id);
+            renderDashSubDownload();
+            renderDownloadView();
+            showToast("Berkas unduhan telah dihapus.");
+        }
+
+        function clearTickerText() {
+            appState.tickerText = "";
+            document.getElementById('tickerInput').value = "";
+            document.getElementById('breakingNewsMarquee').innerText = "Tidak ada running text aktif.";
+            showToast("Running text dikosongkan.");
+        }
+
+        function deleteCustomPage() {
+            appState.customPage.title = "";
+            appState.customPage.content = "";
+            appState.customPage.visible = false;
+            document.getElementById('customPageTitleInput').value = "";
+            document.getElementById('customPageContentInput').value = "";
+            document.getElementById('nav-custom-page').classList.add('hidden');
+            renderCustomPageView();
+            showToast("Halaman custom berhasil dihapus!");
+        }
+
+        function deleteUserItem(username) {
+            if (username === 'Tamansiswa') {
+                showToast("Akun Admin Utama tidak bisa dihapus!", "error");
+                return;
+            }
+            appState.users = appState.users.filter(u => u.username !== username);
+            localStorage.setItem('tamvesta_users_db', JSON.stringify(appState.users));
+            renderDashSubUsers();
+            renderDashSubOverview();
+            showToast(`Pengguna '${username}' telah dihapus.`);
+        }
+
+        // Subviews Render Public Section
+        function renderPengumumanView() {
+            const container = document.getElementById('pengumumanList');
+            const activeOnly = appState.announcements.filter(a => a.active);
+            if (!activeOnly.length) {
+                container.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">Belum ada pengumuman aktif.</p>`;
+                return;
+            }
+            container.innerHTML = activeOnly.map(a => `
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="px-2.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold">${a.priority}</span>
+                        <span class="text-slate-400">${a.date}</span>
+                    </div>
+                    <h3 class="text-base font-extrabold text-slate-800 dark:text-white">${a.title}</h3>
+                    <p class="text-xs text-slate-600 dark:text-slate-300">${a.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderBlogView() {
+            const grid = document.getElementById('blogGrid');
+            if (!appState.blogs.length) {
+                grid.innerHTML = `<p class="col-span-full text-xs text-slate-400 py-4 text-center">Belum ada artikel blog.</p>`;
+                return;
+            }
+            grid.innerHTML = appState.blogs.map(b => `
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                    <span class="text-[10px] bg-purple-100 text-purple-800 px-2.5 py-1 rounded-md font-bold">${b.category}</span>
+                    <h3 class="text-lg font-extrabold text-slate-800 dark:text-white">${b.title}</h3>
+                    <p class="text-xs text-slate-500 line-clamp-3">${b.content}</p>
+                    <span class="text-xs text-slate-400 block border-t border-slate-100 dark:border-slate-700 pt-2"><i class="fa-solid fa-pen-nib mr-1"></i> ${b.author}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderMemoryView() {
+            const grid = document.getElementById('memoryGalleryGrid');
+            if (!appState.memories.length) {
+                grid.innerHTML = `<p class="col-span-full text-xs text-slate-400 py-4 text-center">Belum ada foto galeri.</p>`;
+                return;
+            }
+            grid.innerHTML = appState.memories.map(m => `
+                <div class="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <img src="${m.image}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h4 class="font-bold text-xs text-slate-800 dark:text-white">${m.title}</h4>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPrestasiView() {
+            const grid = document.getElementById('prestasiGrid');
+            if (!appState.prestasi.length) {
+                grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-xs">Belum ada data prestasi.</div>`;
+                return;
+            }
+            grid.innerHTML = appState.prestasi.map(p => `
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-2">
+                    <i class="fa-solid fa-trophy text-amber-500 text-2xl"></i>
+                    <h3 class="font-extrabold text-sm text-slate-800 dark:text-white">${p.title}</h3>
+                    <p class="text-xs text-slate-500">Peraih: <strong>${p.name}</strong> (${p.category})</p>
+                </div>
+            `).join('');
+        }
+
+        function renderKegiatanView() {
+            const list = document.getElementById('kegiatanList');
+            if (!appState.kegiatan.length) {
+                list.innerHTML = `<p class="text-xs text-slate-400 py-4 text-center">Belum ada agenda kegiatan.</p>`;
+                return;
+            }
+            list.innerHTML = appState.kegiatan.map(k => `
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between text-xs">
+                    <div>
+                        <h4 class="font-bold text-slate-800 dark:text-white text-sm">${k.title}</h4>
+                        <span class="text-slate-400"><i class="fa-solid fa-location-dot mr-1"></i>${k.location}</span>
+                    </div>
+                    <span class="bg-sky-100 text-sky-800 font-bold px-3 py-1 rounded-lg">${k.date}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderDownloadView() {
+            const grid = document.getElementById('downloadCenterGrid');
+            if (!appState.downloads.length) {
+                grid.innerHTML = `<p class="col-span-full text-xs text-slate-400 py-4 text-center">Belum ada berkas unduhan.</p>`;
+                return;
+            }
+            grid.innerHTML = appState.downloads.map(d => `
+                <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between text-xs">
+                    <div>
+                        <h4 class="font-bold text-slate-800 dark:text-white">${d.title}</h4>
+                        <span class="text-slate-400">${d.size}</span>
+                    </div>
+                    <button onclick="showToast('Mengunduh berkas...')" class="bg-tamvesta-600 text-white p-2 rounded-lg hover:bg-tamvesta-700 transition"><i class="fa-solid fa-download"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function saveTickerText() {
+            const text = document.getElementById('tickerInput').value.trim();
+            if (text) {
+                appState.tickerText = text;
+                document.getElementById('breakingNewsMarquee').innerText = text;
+                showToast("Running text Breaking News berhasil diperbarui!");
+            }
+        }
+
+        function saveCustomPage() {
+            const title = document.getElementById('customPageTitleInput').value.trim();
+            const content = document.getElementById('customPageContentInput').value.trim();
+
+            if (title && content) {
+                appState.customPage.title = title;
+                appState.customPage.content = content;
+                appState.customPage.visible = true;
+                
+                document.getElementById('nav-custom-page').classList.remove('hidden');
+                document.getElementById('nav-custom-page').innerText = title;
+                renderCustomPageView();
+                showToast("Halaman custom berhasil diterbitkan!");
+            }
+        }
+
+        function toggleCustomPageVisibility() {
+            appState.customPage.visible = !appState.customPage.visible;
+            const btn = document.getElementById('btnToggleCustomPageNav');
+            if (appState.customPage.visible) {
+                document.getElementById('nav-custom-page').classList.remove('hidden');
+                btn.innerText = "Sembunyikan dari Navbar";
+                btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-100 text-rose-700";
+            } else {
+                document.getElementById('nav-custom-page').classList.add('hidden');
+                btn.innerText = "Tampilkan di Navbar";
+                btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700";
+            }
+        }
+
+        function renderCustomPageView() {
+            document.getElementById('customPageTitle').innerText = appState.customPage.title || "Halaman Custom";
+            document.getElementById('customPageContent').innerHTML = appState.customPage.content || "<p class='text-slate-400'>Konten belum diisi.</p>";
+        }
+
+        // CRUD Modal Triggers
+        function openModalCreateNews() { openCrudModal('news', 'Tambah Berita Baru'); }
+        function openModalAddPengumuman() { openCrudModal('announcement', 'Tambah Pengumuman Baru'); }
+        function openModalAddBlog() { openCrudModal('blog', 'Tulis Artikel Blog'); }
+        function openModalAddMemory() { openCrudModal('memory', 'Tambah Foto Galeri Memory'); }
+        function openModalAddPrestasi() { openCrudModal('prestasi', 'Catat Prestasi Siswa'); }
+        function openModalAddKegiatan() { openCrudModal('kegiatan', 'Tambah Kegiatan Agenda'); }
+        function openModalAddDownload() { openCrudModal('download', 'Tambah Berkas File'); }
+
+        function openCrudModal(type, title) {
+            document.getElementById('crudType').value = type;
+            document.getElementById('crudModalTitle').innerText = title;
+            document.getElementById('genericCrudForm').reset();
+            document.getElementById('crudModal').classList.remove('hidden');
+        }
+        function closeCrudModal() {
+            document.getElementById('crudModal').classList.add('hidden');
+        }
+
+        function handleCrudSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('crudType').value;
+            const title = document.getElementById('crudTitle').value.trim();
+            const category = document.getElementById('crudCategory').value.trim() || 'Umum';
+            const image = document.getElementById('crudImage').value.trim() || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80';
+            const content = document.getElementById('crudContent').value.trim();
+
+            if (type === 'news') {
+                appState.news.unshift({ id: Date.now(), title, category, date: 'Hari Ini', views: 1, author: 'Admin Tamansiswa', image, content });
+                renderMainNewsGrid();
+                renderDashSubBerita();
+                renderDashSubOverview();
+            } else if (type === 'announcement') {
+                appState.announcements.unshift({ id: Date.now(), title, priority: category, date: 'Hari Ini', content, active: true });
+                renderPengumumanView();
+                renderDashSubPengumuman();
+                renderDashSubOverview();
+            } else if (type === 'blog') {
+                appState.blogs.unshift({ id: Date.now(), title, category, author: 'Penulis Tamvesta', content });
+                renderBlogView();
+                renderDashSubBlog();
+            } else if (type === 'memory') {
+                appState.memories.unshift({ id: Date.now(), title, image });
+                renderMemoryView();
+                renderDashSubMemory();
+                renderDashSubOverview();
+            } else if (type === 'prestasi') {
+                appState.prestasi.unshift({ id: Date.now(), title, name: category, category: 'Tingkat Sekolah' });
+                renderPrestasiView();
+                renderDashSubPrestasi();
+            } else if (type === 'kegiatan') {
+                appState.kegiatan.unshift({ id: Date.now(), title, location: category, date: 'Mendatang' });
+                renderKegiatanView();
+                renderDashSubKegiatan();
+            } else if (type === 'download') {
+                appState.downloads.unshift({ id: Date.now(), title, size: '1.5 MB' });
+                renderDownloadView();
+                renderDashSubDownload();
+            }
+
+            closeCrudModal();
+            showToast("Data berhasil diterbitkan!");
+        }
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            if (type === "error") {
+                icon.className = "fa-solid fa-circle-xmark text-rose-400 text-base";
+            } else {
+                icon.className = "fa-solid fa-circle-check text-emerald-400 text-base";
+            }
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+    </script>
+</body>
+</html>
